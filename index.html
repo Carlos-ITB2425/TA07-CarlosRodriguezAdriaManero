@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Consumos y Gastos</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Dashboard de Consumos y Gastos</h1>
+        <div class="date-range-container">
+            <div class="date-picker">
+                <label for="start-date">Fecha inicio:</label>
+                <input type="date" id="start-date">
+            </div>
+            <div class="date-picker">
+                <label for="end-date">Fecha fin:</label>
+                <input type="date" id="end-date">
+            </div>
+            <button id="apply-dates">Aplicar</button>
+            <button id="export-pdf"><i class="fas fa-file-pdf"></i> Exportar a PDF</button>
+        </div>
+    </header>
+
+    <nav class="tabs">
+        <button class="tab-button active" data-tab="electricity">Electricidad</button>
+        <button class="tab-button" data-tab="water">Agua</button>
+        <button class="tab-button" data-tab="materials">Gastos Materiales</button>
+    </nav>
+
+    <main>
+        <!-- Sección de Electricidad -->
+        <section id="electricity" class="tab-content active">
+            <div class="charts-container">
+                <div class="chart-wrapper">
+                    <h3>Consumo vs. Importación</h3>
+                    <canvas id="electricity-consumption-chart"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <h3>Autoconsumo</h3>
+                    <canvas id="electricity-self-consumption-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="calculator-container">
+                <h2>Calculadora de Electricidad</h2>
+                <div class="calculator-grid">
+                    <div class="calculator-section">
+                        <h3>Estimaciones para hoy</h3>
+                        <div class="calculator-item">
+                            <span>Consumo total esperado:</span>
+                            <span id="today-consumption" class="value">0 kWh</span>
+                        </div>
+                        <div class="calculator-item">
+                            <span>Producción esperada:</span>
+                            <span id="today-production" class="value">0 kWh</span>
+                        </div>
+                        <div class="calculator-item">
+                            <span>Autoconsumo esperado:</span>
+                            <span id="today-self-consumption" class="value">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="calculator-section interactive">
+                        <h3>Proyección Anual</h3>
+                        <div class="calculator-item with-controls">
+                            <span>Consumo anual:</span>
+                            <div class="control-group">
+                                <button class="decrease"><i class="fas fa-minus"></i></button>
+                                <span id="yearly-consumption" class="value">0 kWh</span>
+                                <button class="increase"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="calculator-item with-controls">
+                            <span>Producción anual:</span>
+                            <div class="control-group">
+                                <button class="decrease"><i class="fas fa-minus"></i></button>
+                                <span id="yearly-production" class="value">0 kWh</span>
+                                <button class="increase"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="calculator-item with-controls">
+                            <span>Autoconsumo anual:</span>
+                            <div class="control-group">
+                                <button class="decrease"><i class="fas fa-minus"></i></button>
+                                <span id="yearly-self-consumption" class="value">0%</span>
+                                <button class="increase"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Agua -->
+        <section id="water" class="tab-content">
+            <div class="charts-container">
+                <div class="chart-wrapper">
+                    <h3>Consumo de Agua</h3>
+                    <canvas id="water-consumption-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="calculator-container">
+                <h2>Calculadora de Agua</h2>
+                <div class="calculator-grid">
+                    <div class="calculator-section">
+                        <h3>Estimaciones</h3>
+                        <div class="calculator-item">
+                            <span>Consumo estimado para hoy:</span>
+                            <span id="today-water-consumption" class="value">0 L</span>
+                        </div>
+                        <div class="calculator-item">
+                            <span>Consumo estimado mensual:</span>
+                            <span id="monthly-water-consumption" class="value">0 L</span>
+                        </div>
+                        <div class="calculator-item">
+                            <span>Consumo estimado anual:</span>
+                            <span id="yearly-water-consumption" class="value">0 L</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Gastos Materiales -->
+        <section id="materials" class="tab-content">
+            <div class="charts-container">
+                <div class="chart-wrapper">
+                    <h3>Gastos Materiales por Mes</h3>
+                    <canvas id="materials-expense-chart"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <h3>Distribución de Gastos</h3>
+                    <canvas id="materials-distribution-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="calculator-container">
+                <h2>Proyección de Gastos Materiales</h2>
+                <div class="calculator-section">
+                    <div class="calculator-item">
+                        <span>Gasto anual estimado:</span>
+                        <span id="yearly-materials-expense" class="value">0 €</span>
+                    </div>
+                    <div class="calculator-item">
+                        <span>Promedio mensual:</span>
+                        <span id="monthly-materials-expense" class="value">0 €</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Dashboard de Consumos y Gastos</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
